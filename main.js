@@ -7,16 +7,13 @@ const spanAprovado = '<span class="resultado aprovado">Aprovado</span>';
 const spanReprovado = '<span class="resultado reprovado">Reprovado</span>';
 const notaMinima = parseFloat(prompt('Digite a nota mínima: '));
 
-    let coluna = '';
-
 form.addEventListener('submit', function(e) {
     e.preventDefault();
 
     adicionaLinha();
     atualizaTabela();
     atualizaMediaFinal();
-    calculaMediaFinal();
-});
+})
 
 function adicionaLinha() {
     const inputNomeAtividade = document.getElementById('nome-atividade');
@@ -28,24 +25,36 @@ function adicionaLinha() {
         atividades.push(inputNomeAtividade.value);
         notas.push(parseFloat(inputNotaAtividade.value));
 
-        let linha = '<tr>';
-        linha += `<td>${inputNomeAtividade.value}</td>`;
-        linha += `<td>${inputNotaAtividade.value}</td>`;
-        linha += `<td>${inputNotaAtividade.value >= notaMinima ? imgAprovado : imgReprovado}</td>`;
-        linha += '</tr>';
-
-        coluna += linha;
-        }
-
+        atualizaTabela();
+    }
 
     inputNomeAtividade.value = '';
-    inputNomeAtividade.value = '';
-};
+    inputNotaAtividade.value = '';
+}
 
-function atualizaTabela(){
+function removeAtividade(nomeAtividade) {
+    const index = atividades.indexOf(nomeAtividade);
+    if (index > -1) {
+        atividades.splice(index, 1);
+        notas.splice(index, 1);
+        atualizaTabela();
+        atualizaMediaFinal();
+    }
+}
+
+function atualizaTabela() {
     const corpoTabela = document.querySelector('tbody');
-    corpoTabela.innerHTML = coluna;
-};
+    corpoTabela.innerHTML = '';
+
+    for (let i = 0; i < atividades.length; i++) {
+        let linha = '<tr>';
+        linha += `<td>${atividades[i]}</td>`;
+        linha += `<td>${notas[i]}</td>`;
+        linha += `<td><button class="btn-excluir" onclick="removeAtividade('${atividades[i]}')">Excluir</button></td>`;
+        linha += '</tr>';
+        corpoTabela.innerHTML += linha;
+    }
+}
 
 function atualizaMediaFinal(){
     const mediaFinal = calculaMediaFinal();
@@ -53,6 +62,8 @@ function atualizaMediaFinal(){
     document.getElementById('resultado-final').innerHTML = mediaFinal.toFixed(2); //toFixed limita casas decimais
     document.getElementById('resultado-media-final').innerHTML = mediaFinal >= notaMinima ? spanAprovado : spanReprovado;
 
+    // Adiciona a imagem de aprovado ou reprovado abaixo da média final
+    document.getElementById('resultado-media-final').innerHTML += mediaFinal >= notaMinima ? imgAprovado : imgReprovado;
 }
 
 function calculaMediaFinal(){
@@ -64,6 +75,7 @@ function calculaMediaFinal(){
 
     return somaDasNotas / notas.length;
 }
+
 
 
 
